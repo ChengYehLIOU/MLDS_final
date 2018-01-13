@@ -32,7 +32,14 @@ def get_data(input_path):
 
     visualise = False
 
-    data_paths = [os.path.join(input_path,s) for s in [ 's000']]
+    folder1 = os.path.join(input_path,'DeepQ-Synth-Hand-01','data')
+    folder2 = os.path.join(input_path,'DeepQ-Synth-Hand-02','data')
+    data_paths = [os.path.join(folder1,s) for s in [ 's000','s001','s002','s003','s004']]
+    for s in ['s005','s006','s007','s008','s009']:
+        data_paths.append(os.path.join(folder2,s))
+
+
+    print('Having ',len(data_paths),' folder')
     
 
     print('Parsing annotation files')
@@ -40,17 +47,25 @@ def get_data(input_path):
     for data_path in data_paths:
 
         print('data path is:',data_path)
-        annot_path = os.path.join(data_path, 'json')
+        annot_path = os.path.join(data_path, 'label')
         imgs_path = os.path.join(data_path, 'img')
-        imgsets_path_trainval = os.path.join(data_path,'img_name_list.txt')
+        
+        
+        #imgsets_path_trainval = os.path.join(data_path,'img_name_list.txt')
+        
         #imgsets_path_test = os.path.join(data_path, 'ImageSets','Main','test.txt')
 
         trainval_files = []
         test_files = []
         try:
+            for i in range(10000):
+                s = 'img_'+str(i).zfill(8)+'.png'
+                trainval_files.append(s)
+            '''    
             with open(imgsets_path_trainval) as f:
                 for line in f:
                     trainval_files.append(line.strip())
+            '''
         except Exception as e:
             print(e)
 
@@ -67,7 +82,6 @@ def get_data(input_path):
                 print(e)
         '''
         annots = [os.path.join(annot_path, s) for s in os.listdir(annot_path)]
-        print(annot_path)
         for i in range(len(os.listdir(annot_path))):
             try:
                 label = readJSON(os.path.join(annot_path,('label_'+str(i).zfill(8)+'.json')))       
