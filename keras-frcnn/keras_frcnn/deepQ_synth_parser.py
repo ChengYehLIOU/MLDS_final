@@ -95,9 +95,10 @@ def get_data(input_path):
 
                     if class_name not in classes_count:
                         classes_count[class_name] = 1
+                    '''
                     else:
                         classes_count[class_name] += 1
-
+                    '''
                     if class_name not in class_mapping:
                         class_mapping[class_name] = len(class_mapping)
 
@@ -108,6 +109,7 @@ def get_data(input_path):
                     difficulty = 0
                     if not [x1,y1,x2,y2] == [0,0,0,0]:
                         annotation_data['bboxes'].append({'class': class_name, 'x1': x1, 'x2': x2, 'y1': y1, 'y2': y2, 'difficult': difficulty})
+                        classes_count[class_name] +=1
                 all_imgs.append(annotation_data)
 
                 if visualise:
