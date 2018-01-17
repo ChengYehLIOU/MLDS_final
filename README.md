@@ -1,6 +1,6 @@
 # MLDS_final
 
-2018.1.7
+2018.1.7\n
 分工 -> 宗嫄+陽明: CycleGAN + SimGAN ( Generator 應該接在feature domain還是image domain之爭)
         承曄+政彥: mask R-CNN,faster R-CNN
 等mask R-CNN完成後，考慮使用hTC 投影片的方法來fine tune & transfer learning
