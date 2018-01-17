@@ -1,6 +1,22 @@
-## Download pre-train model
+
+## Download model
+Download ResNet50 pre-train model:  
+
 	bash downloadResNet50.sh
+
+Download our best fine-tuned model:  
+
+
 ## Set up the environment
+Our environment:  
+1. python 3.5.2  
+2. keras 2.0.6
+3. tenserflow 1.1.0
+
+Reqired package:
+1. numpy
+2. opencv-python
+
 
 ## How to run our code
 
