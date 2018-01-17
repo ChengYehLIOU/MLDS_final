@@ -1,2 +1,4 @@
 *.png
 *.json
+*.hdf5
+*.h5

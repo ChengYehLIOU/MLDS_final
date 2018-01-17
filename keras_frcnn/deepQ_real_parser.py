@@ -32,7 +32,17 @@ def get_data(input_path):
 
     visualise = False
 
-    data_paths = [os.path.join(input_path,s) for s in [ 's000']]
+    folder = os.path.join(input_path,'DeepQ-Vivepaper','data')
+    data_paths = [os.path.join(folder,s) for s in ['air','book']]
+    
+#    folder1 = os.path.join(input_path,'DeepQ-Synth-Hand-01','data')
+#    folder2 = os.path.join(input_path,'DeepQ-Synth-Hand-02','data')
+#    data_paths = [os.path.join(folder1,s) for s in [ 's000','s001','s002','s003','s004']]
+#    for s in ['s005','s006','s007','s008','s009']:
+#        data_paths.append(os.path.join(folder2,s))
+
+
+    print('Having ',len(data_paths),' folder')
     
 
     print('Parsing annotation files')
@@ -40,17 +50,25 @@ def get_data(input_path):
     for data_path in data_paths:
 
         print('data path is:',data_path)
-        annot_path = os.path.join(data_path, 'json')
+        annot_path = os.path.join(data_path, 'label')
         imgs_path = os.path.join(data_path, 'img')
-        imgsets_path_trainval = os.path.join(data_path,'img_name_list.txt')
+        
+        
+        #imgsets_path_trainval = os.path.join(data_path,'img_name_list.txt')
+        
         #imgsets_path_test = os.path.join(data_path, 'ImageSets','Main','test.txt')
 
         trainval_files = []
         test_files = []
         try:
+            for i in range(10000):
+                s = 'img_'+str(i).zfill(5)+'.png'
+                trainval_files.append(s)
+            '''    
             with open(imgsets_path_trainval) as f:
                 for line in f:
                     trainval_files.append(line.strip())
+            '''
         except Exception as e:
             print(e)
 
@@ -67,10 +85,9 @@ def get_data(input_path):
                 print(e)
         '''
         annots = [os.path.join(annot_path, s) for s in os.listdir(annot_path)]
-        print(annot_path)
         for i in range(len(os.listdir(annot_path))):
             try:
-                label = readJSON(os.path.join(annot_path,('label_'+str(i).zfill(8)+'.json')))       
+                label = readJSON(os.path.join(annot_path,('label_'+str(i).zfill(5)+'.json')))       
                 annotation_data = {'filepath': os.path.join(imgs_path, trainval_files[i]), 'width': 240,'height': 320, 'bboxes': []}
                 annotation_data['imageset'] = 'trainval'
                 for idx,lab in enumerate(label):
@@ -81,9 +98,10 @@ def get_data(input_path):
 
                     if class_name not in classes_count:
                         classes_count[class_name] = 1
+                    '''
                     else:
                         classes_count[class_name] += 1
-
+                    '''
                     if class_name not in class_mapping:
                         class_mapping[class_name] = len(class_mapping)
 
@@ -94,6 +112,7 @@ def get_data(input_path):
                     difficulty = 0
                     if not [x1,y1,x2,y2] == [0,0,0,0]:
                         annotation_data['bboxes'].append({'class': class_name, 'x1': x1, 'x2': x2, 'y1': y1, 'y2': y2, 'difficult': difficulty})
+                        classes_count[class_name] +=1
                 all_imgs.append(annotation_data)
 
                 if visualise:

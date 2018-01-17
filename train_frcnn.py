@@ -29,7 +29,7 @@ parser.add_option("--hf", dest="horizontal_flips", help="Augment with horizontal
 parser.add_option("--vf", dest="vertical_flips", help="Augment with vertical flips in training. (Default=false).", action="store_true", default=False)
 parser.add_option("--rot", "--rot_90", dest="rot_90", help="Augment with 90 degree rotations in training. (Default=false).",
 				  action="store_true", default=False)
-parser.add_option("--num_epochs", type="int", dest="num_epochs", help="Number of epochs.", default=80)
+parser.add_option("--num_epochs", type="int", dest="num_epochs", help="Number of epochs.", default=200)
 parser.add_option("--config_filename", dest="config_filename", help=
 				"Location to store all the metadata related to the training (to be used when testing).",
 				default="config.pickle")
@@ -47,6 +47,8 @@ elif options.parser == 'simple':
 	from keras_frcnn.simple_parser import get_data
 elif options.parser == 'deepQ_Synth':
         from keras_frcnn.deepQ_synth_parser import get_data
+elif options.parser == 'deepQ_Real':
+        from keras_frcnn.deepQ_real_parser import get_data
 else:
 	raise ValueError("Command line option parser must be one of 'pascal_voc' or 'simple'")
 
@@ -142,11 +144,17 @@ except:
 	print('Could not load pretrained model weights. Weights can be found in the keras application folder \
 		https://github.com/fchollet/keras/tree/master/keras/applications')
 
-optimizer = Adam(lr=1e-5)
-optimizer_classifier = Adam(lr=1e-5)
+#optimizer = Adam(lr=1e-5)
+#optimizer_classifier = Adam(lr=1e-5)
+#SGD(lr=0.01, momentum=0.0, decay=0.0, nesterov=False)
+r = 0.1
+optimizer = Adam(lr=1e-5*r)
+optimizer_classifier = Adam(lr=1e-5*r)
+optimizer_all = SGD(lr=1e-2*r)
+
 model_rpn.compile(optimizer=optimizer, loss=[losses.rpn_loss_cls(num_anchors), losses.rpn_loss_regr(num_anchors)])
 model_classifier.compile(optimizer=optimizer_classifier, loss=[losses.class_loss_cls, losses.class_loss_regr(len(classes_count)-1)], metrics={'dense_class_{}'.format(len(classes_count)): 'accuracy'})
-model_all.compile(optimizer='sgd', loss='mae')
+model_all.compile(optimizer=optimizer_all, loss='mae')
 
 epoch_length = 1000
 num_epochs = int(options.num_epochs)

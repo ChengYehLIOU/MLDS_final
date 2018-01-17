@@ -11,6 +11,7 @@ from keras import backend as K
 from keras.layers import Input
 from keras.models import Model
 from keras_frcnn import roi_helpers
+import judger_hand
 
 sys.setrecursionlimit(40000)
 
@@ -147,14 +148,16 @@ bbox_threshold = 0.8
 
 visualise = True
 
-for idx, img_name in enumerate(sorted(os.listdir(img_path))):
-	if not img_name.lower().endswith(('.bmp', '.jpeg', '.jpg', '.png', '.tif', '.tiff')):
-		continue
-	print(img_name)
-	st = time.time()
-	filepath = os.path.join(img_path,img_name)
+imgs_paths = judger_hand.get_file_names()
+f = judger_hand.get_output_file_object()
 
-	img = cv2.imread(filepath)
+#for idx, img_name in enumerate(sorted(os.listdir(img_path))):
+idx=0
+for img_name in imgs_paths:
+	idx+=1
+	st = time.time()
+
+	img = cv2.imread(img_name)
 
 	X, ratio = format_img(img, C)
 
@@ -223,25 +226,44 @@ for idx, img_name in enumerate(sorted(os.listdir(img_path))):
 		bbox = np.array(bboxes[key])
 
 		new_boxes, new_probs = roi_helpers.non_max_suppression_fast(bbox, np.array(probs[key]), overlap_thresh=0.5)
-		for jk in range(new_boxes.shape[0]):
-			(x1, y1, x2, y2) = new_boxes[jk,:]
 
-			(real_x1, real_y1, real_x2, real_y2) = get_real_coordinates(ratio, x1, y1, x2, y2)
+		ss = 0
+		jk = np.argmax(new_probs)
+		#for jk in range(new_boxes.shape[0]):
+		(x1, y1, x2, y2) = new_boxes[jk,:]
 
-			cv2.rectangle(img,(real_x1, real_y1), (real_x2, real_y2), (int(class_to_color[key][0]), int(class_to_color[key][1]), int(class_to_color[key][2])),2)
+		(real_x1, real_y1, real_x2, real_y2) = get_real_coordinates(ratio, x1, y1, x2, y2)
 
-			textLabel = '{}: {}'.format(key,int(100*new_probs[jk]))
-			all_dets.append((key,100*new_probs[jk]))
+		cv2.rectangle(img,(real_x1, real_y1), (real_x2, real_y2), (int(class_to_color[key][0]), int(class_to_color[key][1]), int(class_to_color[key][2])),2)
 
-			(retval,baseLine) = cv2.getTextSize(textLabel,cv2.FONT_HERSHEY_COMPLEX,1,1)
-			textOrg = (real_x1, real_y1-0)
+		textLabel = '{}: {}'.format(key,int(100*new_probs[jk]))
+		#all_dets.append((key,100*new_probs[jk]))
 
-			cv2.rectangle(img, (textOrg[0] - 5, textOrg[1]+baseLine - 5), (textOrg[0]+retval[0] + 5, textOrg[1]-retval[1] - 5), (0, 0, 0), 2)
-			cv2.rectangle(img, (textOrg[0] - 5,textOrg[1]+baseLine - 5), (textOrg[0]+retval[0] + 5, textOrg[1]-retval[1] - 5), (255, 255, 255), -1)
-			cv2.putText(img, textLabel, textOrg, cv2.FONT_HERSHEY_DUPLEX, 1, (0, 0, 0), 1)
+		(retval,baseLine) = cv2.getTextSize(textLabel,cv2.FONT_HERSHEY_COMPLEX,1,1)
+		textOrg = (real_x1, real_y1-0)
+
+		cv2.rectangle(img, (textOrg[0] - 5, textOrg[1]+baseLine - 5), (textOrg[0]+retval[0] + 5, textOrg[1]-retval[1] - 5), (0, 0, 0), 2)
+		cv2.rectangle(img, (textOrg[0] - 5,textOrg[1]+baseLine - 5), (textOrg[0]+retval[0] + 5, textOrg[1]-retval[1] - 5), (255, 255, 255), -1)
+		cv2.putText(img, textLabel, textOrg, cv2.FONT_HERSHEY_DUPLEX, 1, (0, 0, 0), 1)
+		if (key=='R'):
+			cls = 1
+		elif (key=='L'):
+			cls = 0
+		#abs_p = os.path.abspath(filepath)
+		#	if(ss < new_probs[jk]):
+		temp = b'%s %d %d %d %d %d %f\n' % (img_name.encode(), real_x1, real_y1, real_x2, real_y2, cls, new_probs[jk] )
+		ss = new_probs[jk]
+		f.write(temp)
+		all_dets.append((key,100*ss))
 
 	print('Elapsed time = {}'.format(time.time() - st))
 	print(all_dets)
-	cv2.imshow('img', img)
-	cv2.waitKey(0)
-	# cv2.imwrite('./results_imgs/{}.png'.format(idx),img)
+	#cv2.imshow('img', img)
+	#cv2.waitKey(0)
+	cv2.imwrite('./results_imgs/{}.png'.format(idx),img)
+
+score, err = judger_hand.judge()
+if err is not None:  # in case we failed to judge your submission
+	print(err)
+
+print(score)
