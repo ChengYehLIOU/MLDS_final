@@ -8,7 +8,8 @@
 每天都要簡單講狀況, daily progress  
 Rule: 可以找其他dataset, 但不能用他們的label  
       可以用script自動產生label，但不能用人工標  
-可能遇到的問題: 1. real data 太少  
-               2. real data 可能都是黃種人，但其他Dataset很可能都是白種人  
-               3. air & book dataset 造成很大的 bias  
-                 
+可能遇到的問題:
+1. real data 太少  
+2. real data 可能都是黃種人，但其他Dataset很可能都是白種人  
+3. air & book dataset 造成很大的 bias  
+  
