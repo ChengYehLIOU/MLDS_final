@@ -6,6 +6,7 @@ Download ResNet50 pre-train model:
 
 Download our best fine-tuned model:  
 
+    bash downloadBestModel.sh
 
 ## Set up the environment
 Our environment:  
