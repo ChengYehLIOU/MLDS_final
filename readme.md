@@ -22,7 +22,7 @@ Reqired package:
 ## How to run our code
 
 #### Training
-	python3 train_frcnn -o <Parser> -p <DataPath> --input_weight_path <InputModelPath> --output_weight_path <OutputModelPath> --num_epochs <EpochNum>
+	python3 train_frcnn.py -o <Parser> -p <DataPath> --input_weight_path <InputModelPath> --output_weight_path <OutputModelPath> --num_epochs <EpochNum>
 
 >-p: Path to training data  
 >-o: Which parser you want to use ('deepQ_Synth' or 'deepQ_Real')  
